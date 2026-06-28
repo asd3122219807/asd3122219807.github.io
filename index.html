@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>今晚吃点啥</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7f8fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #resultText {
+            margin-top: 20%;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            height: 45px;
+            margin-bottom: 10%;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
+
+        /* 顶部向下的红色指针 */
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 35px solid #ff3b30;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* 转盘画布 */
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            /* 核心动画：设置4秒的先快后慢缓动效果 */
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 中间的开始按钮 */
+        .spin-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            z-index: 5;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .spin-btn:active {
+            background-color: #f0f0f0;
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="resultText">今晚吃点啥？</div>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheelCanvas" width="640" height="640"></canvas>
+        <button class="spin-btn" id="spinBtn">开始</button>
+    </div>
+
+    <script>
+        // 菜品列表（你可以随意修改，转盘会自动重新等分）
+        const dishes = [
+            "茄子炒肉沫", "炒青椒", "玉米炒肉", "素炒香菇", "炒西兰花", 
+            "可乐鸡翅", "炒土豆丝", "豆腐脑", "炒鱼", "青椒炒肉丝", 
+            "西红柿炒鸡蛋", "麻辣豆腐", "豆角炒肉", "炒生菜", "炖排骨"
+        ];
+
+        // 鲜艳的颜色数组
+        const colors = [
+            "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", 
+            "#D4A5A5", "#9B59B6", "#3498DB", "#E67E22", "#2ECC71", 
+            "#F1C40F", "#E74C3C", "#1ABC9C", "#95A5A6", "#e84393"
+        ];
+
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const resultText = document.getElementById('resultText');
+
+        const numSlices = dishes.length;
+        const sliceAngle = 2 * Math.PI / numSlices;
+        const radius = canvas.width / 2;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // 1. 绘制转盘
+        function drawWheel() {
+            for (let i = 0; i < numSlices; i++) {
+                const startAngle = i * sliceAngle;
+                const endAngle = (i + 1) * sliceAngle;
+                
+                // 画扇形
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.save();
+
+                // 写文字
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 32px sans-serif";
+                // 将文字推到边缘
+                ctx.fillText(dishes[i], radius - 40, 0);
+                ctx.restore();
+            }
+        }
+
+        drawWheel();
+
+        // 2. 转盘旋转逻辑
+        let currentRotation = 0; // 当前总旋转角度
+        let isSpinning = false;
+
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            isSpinning = true;
+            resultText.innerText = "命运转动中...";
+
+            // 随机选中一个菜品
+            const winnerIndex = Math.floor(Math.random() * numSlices);
+            
+            // 计算角度逻辑
+            const sliceDeg = 360 / numSlices;
+            // 计算选中扇形中心点所需的角度
+            const targetDeg = (winnerIndex * sliceDeg) + (sliceDeg / 2);
+            // 因为指针在正上方（270度），我们需要算出偏移量把它转上去
+            const offsetToTop = 270 - targetDeg;
+
+            // 圈数：每次固定多转 6 圈 (2160度) 增加视觉效果
+            const extraSpins = 360 * 6;
+            
+            // 剥离掉之前累积的度数，重新计算这一轮需要达到的总度数
+            const baseRotation = currentRotation - (currentRotation % 360);
+            currentRotation = baseRotation + extraSpins + offsetToTop;
+
+            // 触发 CSS 动画
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            // 等待动画结束 (4000ms = 4s) 后显示结果
+            setTimeout(() => {
+                resultText.innerText = dishes[winnerIndex];
+                isSpinning = false;
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
