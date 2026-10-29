@@ -6,16 +6,16 @@
 
   const COLS = 8;
   const ROWS = 8;
-  const TYPES = ['dragon', 'milk', 'star', 'heart', 'candy', 'cloud'];
+  const TYPES = ['dragon', 'frog', 'egg', 'dragonPink', 'frogBlue', 'eggPurple'];
   const CELL_PCT = 100 / COLS;
 
   const TYPE_COLOR = {
     dragon: '#FFC93C',
-    milk: '#7FD0F5',
-    star: '#FF9A2E',
-    heart: '#FF6FA5',
-    candy: '#A97CF5',
-    cloud: '#6FC8F0'
+    frog: '#6FD24F',
+    egg: '#EBD9B4',
+    dragonPink: '#FF8DBE',
+    frogBlue: '#63C4F2',
+    eggPurple: '#B18CFF'
   };
 
   const EASE = 'cubic-bezier(.3,.75,.35,1)';
@@ -30,66 +30,75 @@
     <path d="M${x - 4.4 * s} ${y + 5.6 * s} q${4.4 * s} ${4.2 * s} ${8.8 * s} 0"
           stroke="#4A3018" stroke-width="${2.2 * s}" fill="none" stroke-linecap="round"/>`;
 
-  const ART = {
-    dragon: `
-      <path d="M33 33c-7-9-1-16 7-9l6 7z" fill="#F2B33A"/>
-      <path d="M67 33c7-9 1-16-7-9l-6 7z" fill="#F2B33A"/>
-      <ellipse cx="50" cy="58" rx="33" ry="30" fill="#FFD645"/>
-      <ellipse cx="50" cy="64" rx="23" ry="21" fill="#FFE68F"/>
+  function dragonArt(c) {
+    return `
+      <path d="M33 33c-7-9-1-16 7-9l6 7z" fill="${c.horn}"/>
+      <path d="M67 33c7-9 1-16-7-9l-6 7z" fill="${c.horn}"/>
+      <ellipse cx="50" cy="58" rx="33" ry="30" fill="${c.body}"/>
+      <ellipse cx="50" cy="64" rx="23" ry="21" fill="${c.belly}"/>
       <circle cx="38" cy="53" r="8.2" fill="#fff"/>
       <circle cx="62" cy="53" r="8.2" fill="#fff"/>
       <circle cx="38.4" cy="54.4" r="4.3" fill="#3F2A12"/>
       <circle cx="61.6" cy="54.4" r="4.3" fill="#3F2A12"/>
       <circle cx="36.9" cy="52.6" r="1.5" fill="#fff"/>
       <circle cx="60.1" cy="52.6" r="1.5" fill="#fff"/>
-      <ellipse cx="50" cy="67" rx="15" ry="10.5" fill="#FFF3B8"/>
-      <ellipse cx="46" cy="63.6" rx="2" ry="1.5" fill="#C08A38" opacity=".55"/>
-      <ellipse cx="54" cy="63.6" rx="2" ry="1.5" fill="#C08A38" opacity=".55"/>
+      <ellipse cx="50" cy="67" rx="15" ry="10.5" fill="${c.muzzle}"/>
+      <ellipse cx="46" cy="63.6" rx="2" ry="1.5" fill="${c.snout}" opacity=".55"/>
+      <ellipse cx="54" cy="63.6" rx="2" ry="1.5" fill="${c.snout}" opacity=".55"/>
       <path d="M44.5 69.5q5.5 5 11 0" stroke="#4A3018" stroke-width="2.6" fill="none" stroke-linecap="round"/>
       <circle cx="26.5" cy="63" r="4.6" fill="#FF9DBB" opacity=".62"/>
       <circle cx="73.5" cy="63" r="4.6" fill="#FF9DBB" opacity=".62"/>
-    `,
-    milk: `
-      <rect x="38.5" y="12" width="23" height="9.5" rx="4.4" fill="#63C5F2"/>
-      <rect x="42" y="21.5" width="16" height="5" fill="#A8DDF7"/>
-      <path d="M41 26h18v7c9 4.2 13 13 13 23v21.5a9 9 0 0 1-9 9H37a9 9 0 0 1-9-9V56c0-10 4-18.8 13-23z"
-            fill="#FFFDF6" stroke="#E6D8BC" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M31 60h38v17.5a9 9 0 0 1-9 9H40a9 9 0 0 1-9-9z" fill="#E2F2FF"/>
-      <path d="M36 64h28" stroke="#BFE2FA" stroke-width="2.5" stroke-linecap="round"/>
-      ${FACE(50, 50, .82)}
-    `,
-    star: `
-      <path d="M50 11.5l10.4 22 24.1 3.2-17.6 16.8 4.4 24L50 66.2 28.7 77.5l4.4-24L15.5 36.7l24.1-3.2z"
-            fill="#FFA53D" stroke="#EE8517" stroke-width="3.2" stroke-linejoin="round"/>
-      <path d="M50 20.5l6.6 14 15.3 2-11.2 10.7 2.8 15.2L50 55.9l-13.5 6.5 2.8-15.2-11.2-10.7 15.3-2z"
-            fill="#FFBE6B" opacity=".85"/>
-      ${FACE(50, 45, .95)}
-    `,
-    heart: `
-      <path d="M50 82C20.5 62.2 12 46.4 19.6 33.4 26.6 21.4 42.6 21.6 50 35.2c7.4-13.6 23.4-13.8 30.4-1.8C88 46.4 79.5 62.2 50 82z"
-            fill="#FF7FAE" stroke="#F0508E" stroke-width="2.8" stroke-linejoin="round"/>
-      <path d="M28 37c2-5 7-7 11-6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/>
-      ${FACE(50, 50, .95)}
-    `,
-    candy: `
-      <path d="M24 38l-13-9v42l13-9z" fill="#CBA8FF" stroke="#9A6BE8" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M76 38l13-9v42l-13-9z" fill="#CBA8FF" stroke="#9A6BE8" stroke-width="2.4" stroke-linejoin="round"/>
-      <circle cx="50" cy="52" r="25.5" fill="#B98BFF" stroke="#9A6BE8" stroke-width="2.6"/>
-      <path d="M35 44c6-9 24-9 30 0" stroke="#fff" stroke-width="4.2" fill="none" stroke-linecap="round" opacity=".7"/>
-      <path d="M65 60c-6 9-24 9-30 0" stroke="#fff" stroke-width="4.2" fill="none" stroke-linecap="round" opacity=".7"/>
-      ${FACE(50, 52, .9)}
-    `,
-    cloud: `
-      <g fill="#8FD6F8">
-        <circle cx="31" cy="55" r="17"/>
-        <circle cx="50" cy="43" r="20.5"/>
-        <circle cx="69" cy="55" r="16"/>
-        <rect x="26" y="42" width="48" height="30" rx="15"/>
-      </g>
-      <rect x="16" y="59" width="68" height="27" rx="13.5" fill="#B6E7FF"/>
-      <path d="M27 61c2-6 7-9 13-9" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".65"/>
-      ${FACE(50, 48, .9)}
-    `
+    `;
+  }
+
+  function frogArt(c) {
+    return `
+      <circle cx="32" cy="37" r="15" fill="${c.body}"/>
+      <circle cx="68" cy="37" r="15" fill="${c.body}"/>
+      <ellipse cx="50" cy="62" rx="34" ry="27" fill="${c.body}"/>
+      <ellipse cx="50" cy="68" rx="23" ry="16" fill="${c.belly}"/>
+      <circle cx="32" cy="37" r="10.5" fill="#fff"/>
+      <circle cx="68" cy="37" r="10.5" fill="#fff"/>
+      <circle cx="32.5" cy="38.5" r="5.2" fill="#3F2A12"/>
+      <circle cx="67.5" cy="38.5" r="5.2" fill="#3F2A12"/>
+      <circle cx="30.8" cy="36.6" r="1.7" fill="#fff"/>
+      <circle cx="65.8" cy="36.6" r="1.7" fill="#fff"/>
+      <circle cx="46" cy="57" r="1.6" fill="${c.snout}" opacity=".5"/>
+      <circle cx="54" cy="57" r="1.6" fill="${c.snout}" opacity=".5"/>
+      <path d="M38 66q12 11 24 0" stroke="#3F2A12" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <circle cx="23" cy="62" r="4.4" fill="#FF9DBB" opacity=".55"/>
+      <circle cx="77" cy="62" r="4.4" fill="#FF9DBB" opacity=".55"/>
+    `;
+  }
+
+  function eggArt(c) {
+    return `
+      <path d="M50 11C65.5 11 78.5 32.5 78.5 51 78.5 71.5 66 86 50 86 34 86 21.5 71.5 21.5 51 21.5 32.5 34.5 11 50 11Z"
+            fill="${c.fill}" stroke="${c.stroke}" stroke-width="2.8"/>
+      <path d="M36 39c3.5-8 9-12.5 15-13.5" stroke="${c.highlight}" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".75"/>
+      <path d="M36 19.5l5.5 8 4-4.2 3 7.2 4.2-3.4" stroke="${c.stroke}" stroke-width="2.2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+      ${FACE(50, 55, .95)}
+      <circle cx="31" cy="64" r="4.6" fill="#FFB3C9" opacity=".6"/>
+      <circle cx="69" cy="64" r="4.6" fill="#FFB3C9" opacity=".6"/>
+    `;
+  }
+
+  const ART = {
+    dragon: dragonArt({
+      body: '#FFD645', belly: '#FFE68F', horn: '#F2B33A', muzzle: '#FFF3B8', snout: '#C08A38'
+    }),
+    frog: frogArt({
+      body: '#7AD95F', belly: '#BBF0A6', snout: '#3E7A2E'
+    }),
+    egg: eggArt({ fill: '#F4FBFF', stroke: '#A6C0D2', highlight: '#CFEAF9' }),
+    dragonPink: dragonArt({
+      body: '#FF9EC7', belly: '#FFCBE2', horn: '#F278A8', muzzle: '#FFE6F1', snout: '#D77AA0'
+    }),
+    frogBlue: frogArt({
+      body: '#74C9F2', belly: '#BCE8FF', snout: '#3A7FA3'
+    }),
+    eggPurple: eggArt({ fill: '#D4BDFF', stroke: '#9C7BE0', highlight: '#FFFFFF' })
   };
 
   const MASCOT = `
