@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF3DC">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:,">
+<title>奶龙消消乐</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="hud">
+    <div class="pill level-pill">第 <b id="lvl">1</b> 关</div>
+    <div class="score-box">
+      <div class="score-top">
+        <span class="score" id="score">0</span>
+        <span class="target">/ <span id="target">1200</span></span>
+      </div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+    <div class="pill moves-pill" id="movesPill"><b id="moves">22</b><small>步</small></div>
+  </header>
+
+  <main class="board-wrap">
+    <div class="board-frame">
+      <div class="board" id="board"></div>
+    </div>
+  </main>
+
+  <footer class="toolbar">
+    <button class="tool" id="btnHint" type="button"><span>💡</span>提示</button>
+    <button class="tool" id="btnRestart" type="button"><span>↻</span>重玩</button>
+    <button class="tool" id="btnSound" type="button"><span id="soundIcon">🔊</span>音效</button>
+  </footer>
+</div>
+
+<div class="combo" id="combo"></div>
+<div class="toast" id="toast"></div>
+
+<div class="screen" id="startScreen">
+  <div class="start-card">
+    <div class="mascot" id="mascot"></div>
+    <h1 class="title">奶龙消消乐</h1>
+    <p class="tagline">连成三个 · 连锁爆分 · 冲上三星</p>
+    <button class="btn-primary" id="btnStart" type="button">开始游戏</button>
+    <p class="tips">滑动或点选两个相邻方块交换<br>四连出火箭，五连出彩虹球</p>
+  </div>
+</div>
+
+<div class="screen hidden" id="resultScreen">
+  <div class="result-card">
+    <div class="stars" id="resultStars"></div>
+    <h2 id="resultTitle">通关啦！</h2>
+    <p class="result-sub" id="resultSub">本关得分 2500</p>
+    <button class="btn-primary" id="btnNext" type="button">下一关</button>
+    <button class="btn-ghost" id="btnRetry" type="button">再玩一次</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
